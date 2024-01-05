@@ -1,59 +1,117 @@
 
-$fn = 30;
+$fn = 80;
 nothing = 0.01;
 
-// Screw diameter
-d = 4;
-// Top edge
-s = 6;
-// Bottom height
-h1 = 2;
-// Middle height
-h2 = 2;
-// Top height
-h3 = 2;
-// Bottom edge
+
+module screw(x, y, height, diameter) {
+  translate([x, y, -nothing])
+  cylinder(
+    d=diameter,
+    h=height + 2*nothing
+  );
+}
+
+
+module bottom(size_x, size_y, size_z, hole_size_x, hole_size_y) {
+  difference() {
+    cube([size_x, size_y, size_z]);
+
+    // Hole
+    translate([
+        size_x/2 - hole_size_x/2,
+        size_y/2 - hole_size_y/2,
+        -nothing
+    ])
+    cube([
+        hole_size_x,
+        hole_size_y,
+        size_z + 2*nothing
+    ]);
+  }
+}
+
+
+module middle(size_x, size_y, size_z, screw_diameter) {
+  difference() {
+    cube([size_x, size_y, size_z]);
+    screw(
+        x=size_x/2,
+        y=size_y/2,
+        height=size_z,
+        diameter=screw_diameter
+    );
+  }
+}
+
+
+module top(size_x, size_y, size_z, screw_diameter) {
+  difference() {
+    cube([size_x, size_y, size_z]);
+    screw(
+        x=size_x/2,
+        y=size_y/2,
+        height=size_z,
+        diameter=screw_diameter
+    );
+  }
+}
+
+
+module model() {
+
+// screw diameter (nominal)
+s = 4;
+
+// bottom edge
 t = 15;
-// Bottom hole edge
-l = 7;
 
-module screw() {
-  translate([0, 0, -nothing])
-  cylinder(h=h1+h2+h3+2*nothing, d=d);
-}
+// bottom hole edge
+l = 7 + 0.6;
 
-module Schloss() {
-  translate([t/2-l/2, t/2-l/2, -nothing])
-  cube([l, l, h1+2*nothing]);
-}
+// bottom height
+h1 = 2;
 
-module base() {
+// middle height
+h2 = 1;
+
+// top height
+h3 = 3;
+
+// top edge
+e = 6;
+
   difference() {
-    cube([t, t, h1]);
-    Schloss();
-  }
-}
+    union() {
+      bottom(
+        size_x=t,
+        size_y=t,
+        size_z=h1,
+        hole_size_x=l,
+        hole_size_y=l
+      );
 
-module Verbinder() {
-  difference() {
-    cube([t, t, h2+2*nothing]);
-    translate([t/2, t/2])
-    screw();
-  }
-}
+      translate([0, 0, h1 - nothing])
+      middle(
+        size_x=t,
+        size_y=t,
+        size_z=h2,
+        screw_diameter=s
+      );
 
-module plug() {
-  difference() {
-    cube([s, s, h3]);
-    translate([s/2, s/2])
-    screw();
-  }
-}
+      translate([t/2-e/2, t/2-e/2, h1+h2 - 2*nothing])
+      top(
+        size_x=e,
+        size_y=e,
+        size_z=h3,
+        screw_diameter=s
+      );
+    };
 
-union() {
-  base();
-  translate([0, 0, h1 - nothing])
-  Verbinder();
-  translate([t/2-s/2, t/2-s/2, h1+h2 - 2*nothing])
-  plug();
+    screw(
+        x=t/2,
+        y=t/2,
+        diameter=s,
+        height=h1+h2+h3
+    );
+  }
 }
