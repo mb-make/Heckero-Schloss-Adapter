@@ -3,9 +3,9 @@
 *.deb
 
 # Exported
-*.stl
-*.gcode
-*.svg
+# *.stl
+# *.gcode
+# *.svg
 *.png
 *.jpg
 *.jpeg
