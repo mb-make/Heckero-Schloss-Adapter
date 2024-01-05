@@ -5,3 +5,13 @@
 # Exported
 *.stl
 *.gcode
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.mp4
+
+# Temporary
+.*.swp
+*.bak
+.*.lock~
